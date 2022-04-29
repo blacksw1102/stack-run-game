@@ -7,6 +7,7 @@ public class PlayerControllerStackColor : MonoBehaviour
 
     [SerializeField] bool isPlaying;
     [SerializeField] float forwardSpeed;
+    [SerializeField] float sideLerpSpeed;
     Rigidbody myRB;
 
     // Start is called before the first frame update
@@ -23,6 +24,15 @@ public class PlayerControllerStackColor : MonoBehaviour
         {
             MoveForward();
         }
+
+        if(Input.GetMouseButton(0))
+        {
+            if(isPlaying == false)
+            {
+                isPlaying = true;
+            }
+            MoveSideways();
+        }
     }
 
     void SetColor(Color colorIn)
@@ -38,4 +48,15 @@ public class PlayerControllerStackColor : MonoBehaviour
     {
         myRB.velocity = Vector3.forward * forwardSpeed;
     }
+
+    void MoveSideways()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if(Physics.Raycast(ray, out hit, 100))
+        {
+            transform.position = Vector3.Lerp(transform.position, new Vector3(hit.point.x, transform.position.y, transform.position.z), sideLerpSpeed * Time.deltaTime);
+        }
+    }
+
 }
