@@ -7,8 +7,12 @@ public class PlayerControllerStackColor : MonoBehaviour
 
     [SerializeField] bool isPlaying;
     [SerializeField] float forwardSpeed;
-    [SerializeField] float sideLerpSpeed;
     Rigidbody myRB;
+
+    [SerializeField] float lerpSpeed;
+
+    Transform parentPickup;
+    [SerializeField] Transform stackPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -55,7 +59,32 @@ public class PlayerControllerStackColor : MonoBehaviour
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit, 100))
         {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(hit.point.x, transform.position.y, transform.position.z), sideLerpSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, new Vector3(hit.point.x, transform.position.y, transform.position.z), lerpSpeed * Time.deltaTime);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+       
+        if(other.tag == "Pickup")
+        {
+            Transform otherTransform = other.transform;
+
+            Rigidbody otherRB = otherTransform.GetComponent<Rigidbody>();
+            otherRB.isKinematic = true;
+            other.enabled = false;
+            if(parentPickup == null)
+            {
+                parentPickup = otherTransform;
+                parentPickup.position = stackPosition.position;
+                parentPickup.parent = stackPosition;
+            }
+            else
+            {
+                parentPickup.position += Vector3.up * (otherTransform.localScale.y);
+                otherTransform.position = stackPosition.position;
+                otherTransform.parent = parentPickup;
+            }
         }
     }
 
